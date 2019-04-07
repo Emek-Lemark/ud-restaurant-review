@@ -1,7 +1,8 @@
+let cacheKeeplist = 'restaurant-rev-v1'
 
 self.addEventListener('install', event => {
-	//Opened a cache name called restaurant-res-v1
-    event.waitUntil(caches.open('restaurant-res-v1')
+	//Opened a cache name called catchKeeplist
+    event.waitUntil(caches.open(cacheKeeplist)
     //Add an array of URLs to cache 
         .then(cache => cache.addAll([
 				'./',
@@ -27,6 +28,8 @@ self.addEventListener('install', event => {
     );
 });
 
+
+// Respond with an entry from the catch or fetch if there isnt one
 self.addEventListener('fetch', event => {
 	event.respondWith(
 		caches.match(event.request).then(response => {
@@ -34,3 +37,17 @@ self.addEventListener('fetch', event => {
 			return fetch(event.request);
 		}))
 });
+
+// Add activate event to delete old cache
+self.addEventListener('activate', event => {
+	event.waitUntil(caches.keys().then(keyList => {
+			return Promise.all(keyList.filter(key => {
+					return key.startsWith('restaurant-') && 
+						   key != cacheKeeplist;
+				}).map(key => {
+					return caches.delete(key);
+				})
+			);
+		})
+	);
+})
