@@ -1,8 +1,8 @@
-let cacheKeeplist = 'restaurant-rev-v1'
+let cacheKeepList = 'restaurant-rev-v1';
 
 self.addEventListener('install', event => {
 	//Opened a cache name called catchKeeplist
-    event.waitUntil(caches.open(cacheKeeplist)
+    event.waitUntil(caches.open(cacheKeepList)
     //Add an array of URLs to cache 
         .then(cache => cache.addAll([
 				'./',
@@ -43,7 +43,7 @@ self.addEventListener('activate', event => {
 	event.waitUntil(caches.keys().then(keyList => {
 			return Promise.all(keyList.filter(key => {
 					return key.startsWith('restaurant-') && 
-						   key != cacheKeeplist;
+						   key != cacheKeepList;
 				}).map(key => {
 					return caches.delete(key);
 				})
