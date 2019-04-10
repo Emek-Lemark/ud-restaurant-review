@@ -36,10 +36,8 @@ self.addEventListener("install", event => {
 // Respond with an entry from the catch or fetch if there isnt one
 self.addEventListener("fetch", event => {
   if (event.request.url.startsWith(self.location.origin)) {
-    event.respondWith(
-      caches.match(event.request).then(response => {
+    event.respondWith(caches.match(event.request).then(response => {
         if (response) {
-          // console.log("[ServiceWorker] Found in cache ", event.request.url);
           return response;
         }
         return fetch(event.request);
@@ -47,7 +45,6 @@ self.addEventListener("fetch", event => {
     );
   }
 });
-
 
 // Add activate event to delete old cache
 self.addEventListener("activate", event => {
