@@ -1,12 +1,8 @@
-let cacheKeepList = 'restaurant-rev-v1';
-
-self.addEventListener('install', event => {
-	//Opened a cache name called catchKeeplist
-    event.waitUntil(caches.open(cacheKeepList)
-    //Add an array of URLs to cache 
-        .then(cache => cache.addAll([
+let cacheKeepList = 'restaurant-rev-v2';
+let urlsToCache = [ 
 				'./',
 				'./index.html',
+				'./favicon.ico',
 				'./restaurant.html',
 				'./css/styles.css',
 				'./data/restaurants.json',
@@ -24,30 +20,43 @@ self.addEventListener('install', event => {
 				'./img/8.jpg',
 				'./img/9.jpg',
 				'./img/10.jpg'
-        ]))
-    );
+];
+
+//Install service worker
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches
+      .open(cacheKeepList)
+      .then(cache => cache.addAll(urlsToCache))
+      .then(self.skipWaiting())
+  );
 });
 
 
 // Respond with an entry from the catch or fetch if there isnt one
-self.addEventListener('fetch', event => {
-	event.respondWith(
-		caches.match(event.request).then(response => {
-			if (response) return response;
-			return fetch(event.request);
-		}))
+self.addEventListener("fetch", event => {
+  if (event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        if (response) {
+          // console.log("[ServiceWorker] Found in cache ", event.request.url);
+          return response;
+        }
+        return fetch(event.request);
+      })
+    );
+  }
 });
 
+
 // Add activate event to delete old cache
-self.addEventListener('activate', event => {
-	event.waitUntil(caches.keys().then(keyList => {
-			return Promise.all(keyList.filter(key => {
-					return key.startsWith('restaurant-') && 
-						   key != cacheKeepList;
-				}).map(key => {
-					return caches.delete(key);
-				})
-			);
-		})
-	);
+self.addEventListener("activate", event => {
+  event.waitUntil(caches.keys().then(keyList => Promise.all(keyList.map(cache => {
+      if (cache !== cacheKeepList) {
+        console.log("[ServiceWorker] removing cached files from ", cache);
+        return caches.delete(cache);
+      }
+    })))
+  )
 })
+
