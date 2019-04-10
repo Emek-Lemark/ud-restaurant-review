@@ -1,4 +1,4 @@
-let cacheKeepList = 'restaurant-rev-v2';
+let cacheKeepList = 'restaurant-rev-v3';
 let urlsToCache = [ 
 				'./',
 				'./index.html',
@@ -32,6 +32,22 @@ self.addEventListener("install", event => {
   );
 });
 
+// Add activate event to delete old cache
+self.addEventListener("activate", event => {
+  event.waitUntil(
+// Get all the cache names
+  	caches.keys().then(cacheNames => Promise.all(
+  		// Get all items stored under different cache name than Cache list
+  		cahceNames.map(cache => {
+      if (cache !== cacheKeepList) {
+        console.log("[ServiceWorker] removing cached files from ", cache);
+        // delete the item
+        return caches.delete(cache);
+      }
+    })))
+  )
+})
+
 
 // Respond with an entry from the catch or fetch if there isnt one
 self.addEventListener("fetch", event => {
@@ -46,14 +62,4 @@ self.addEventListener("fetch", event => {
   }
 });
 
-// Add activate event to delete old cache
-self.addEventListener("activate", event => {
-  event.waitUntil(caches.keys().then(keyList => Promise.all(keyList.map(cache => {
-      if (cache !== cacheKeepList) {
-        console.log("[ServiceWorker] removing cached files from ", cache);
-        return caches.delete(cache);
-      }
-    })))
-  )
-})
 
