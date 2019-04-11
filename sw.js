@@ -37,7 +37,7 @@ self.addEventListener("install", event => {
 // Add activate event to delete old cache
 self.addEventListener('activate', event => {
   // delete any caches that aren't in cacheKeepList
-  // which will get rid of static-v1
+  // which will get rid of old caches
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
       keys.map(key => {
